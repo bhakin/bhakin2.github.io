@@ -33,6 +33,8 @@ d3.json("imanaga.json").then(function(data) {
     
     function updatePlot(selectedDate) {
         let filteredData = data;
+        let clicked = null;
+
         if (selectedDate !== "all") {
             filteredData = data.filter(d => d.game_date === selectedDate)
         }
@@ -49,20 +51,36 @@ d3.json("imanaga.json").then(function(data) {
             .attr('fill', d => colorScale(d.pitch_type))
             .on("mouseover", (event, d) => {
                 // Update infoDiv content on mouseover
-                infoDiv
-                    .style("left", event.pageX + 10 + "px")  
-                    .style("top", event.pageY + 10 + "px")  
-                    .html(`Pitch Speed: ${d.effective_speed}, Spin Rate: ${d.release_spin_rate}, Pitch Type: ${d.pitch_type}`)
-                    .style("opacity", 1)     
-                    .style("color", "black");               
+                if(!clicked){
+                    infoDiv
+                        .style("left", event.pageX + 10 + "px")  
+                        .style("top", event.pageY + 10 + "px")  
+                        .html(`Pitch Speed: ${d.effective_speed}, Spin Rate: ${d.release_spin_rate}, Pitch Type: ${d.pitch_type}`)
+                        .style("opacity", 1)     
+                        .style("color", "black");  
+                }             
             })
             .on("mouseout", () => {
                 // Clear infoDiv content on mouseout
-                infoDiv
-                    .html("")
-                    .style("opacity", 0);             
-            });
-
+                if(!clicked){
+                    infoDiv.style("opacity", 0);  
+                }
+            })
+            .on("click", (event, d) => {
+                if (clicked === d) {
+                    // Click the same data point to hide
+                    infoDiv.style("opacity", 0);
+                    clicked = null;
+                } else {
+                    // Click a different data point or no tooltip is pinned, show and pin the new tooltip
+                    clicked = d;
+                    infoDiv
+                        .style("left", event.pageX + 10 + "px")
+                        .style("top", event.pageY + 10 + "px")
+                        .html(`Pitch Speed: ${d.effective_speed}, Spin Rate: ${d.release_spin_rate}, Pitch Type: ${d.pitch_type}`)
+                        .style("opacity", 1);
+                }
+            });    
     }
 
     const uniqueDates = new Set(data.map(d => d.game_date));
