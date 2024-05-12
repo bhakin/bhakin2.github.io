@@ -27,7 +27,8 @@ d3.json("imanaga.json").then(function(data) {
         .attr("class", "info")
         .style("position", "absolute")
         .style("left", "300px") // Adjust position as needed
-        .style("top", "593px");
+        .style("top", "593px")
+        .style("opacity", 0);  // Initially hidden
 
     
     function updatePlot(selectedDate) {
@@ -48,12 +49,20 @@ d3.json("imanaga.json").then(function(data) {
             .attr('fill', d => colorScale(d.pitch_type))
             .on("mouseover", (event, d) => {
                 // Update infoDiv content on mouseover
-                infoDiv.html(`Pitch Speed: ${d.effective_speed}, Spin Rate: ${d.release_spin_rate}, Pitch Type: ${d.pitch_type}`);
+                infoDiv
+                    .style("left", event.pageX + 10 + "px")  
+                    .style("top", event.pageY + 10 + "px")  
+                    .html(`Pitch Speed: ${d.effective_speed}, Spin Rate: ${d.release_spin_rate}, Pitch Type: ${d.pitch_type}`)
+                    .style("opacity", 1)     
+                    .style("color", "black");               
             })
             .on("mouseout", () => {
                 // Clear infoDiv content on mouseout
-                infoDiv.html("");
+                infoDiv
+                    .html("")
+                    .style("opacity", 0);             
             });
+
     }
 
     const uniqueDates = new Set(data.map(d => d.game_date));
